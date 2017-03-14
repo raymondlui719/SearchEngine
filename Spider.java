@@ -51,31 +51,37 @@ public class Spider {
 				}
 				pageID.addObject(pageUrl, id);
 				Page page = new Page(recman, pageUrl, id);
+				recman.commit();
 
 				// start printing stuff
 				System.out.println(page.getPageTitle());
 				System.out.println(page.getURL());
-				System.out.print(page.getLastModificationLong() + ", ");
+				System.out.print(page.getLastModification() + ", ");
 				System.out.println(page.getPageSize());
 				page.getWordFreqList().printAll();
 				System.out.println();
 				for(String childLink: page.getChildLinks())
 				{
-					System.out.println(childLink);
+					linksList.add(childLink);
+					// System.out.println(childLink);
 				}
 				System.out.println("-------------------------------------");
+
+				processedLinks.add(pageUrl);
 			}
 		}
 	}
 
 	public static void main(String[] arg) throws IOException, ParserException {
 		String db = "Database";
-		String startUrl = "http://www.cse.ust.hk";
+		String startUrl = "http://www.ust.hk";
 		final int maxPage = 30;
 
 		Spider spider = new Spider(db);
 
 		spider.indexing(startUrl, maxPage);
+
+		spider.finalize();
 
 	}
 }

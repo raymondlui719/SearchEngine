@@ -40,12 +40,17 @@ public class Page {
 			lastModification = uc.getDate();
 		if(uc.getContentLengthLong() > 0)
 			size = uc.getContentLengthLong();
+		else
+			size = 0;
 		indexWordsFromPage();
 		childLinks = Indexer.extractLinks(url);
 	}
 
 	public void indexWordsFromPage() throws ParserException, IOException {
 		Vector<String> words = Indexer.extractWords(this.url);
+		if(size == 0) {
+			size = words.size();
+		}
 		for(String w: words) {
 			String stemmedWord = StopStem.processWord(w);
 			if(stemmedWord == null || stemmedWord.equals(""))

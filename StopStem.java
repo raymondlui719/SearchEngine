@@ -18,6 +18,7 @@ public class StopStem {
 
   static {
     porter = new Porter();
+    stopWords = new Vector<String>();
     readStopWords(stopWords);
   }
 
