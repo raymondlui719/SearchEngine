@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Vector;
+import java.util.Scanner;
+import java.lang.NullPointerException;
 
 @SuppressWarnings("unchecked")
 public class StopStem {
@@ -19,12 +21,12 @@ public class StopStem {
     readStopWords(stopWords);
   }
 
-  public static boolean isStopWord(String str) {
+  private static boolean isStopWord(String str) {
     return stopWords.contains(str);
   }
 
   private static void readStopWords(Vector<String> stopWords) {
-    File f = new File("stopwords.txt");
+    File f = new File("./stopwords.txt");
     if(!f.exists()) {
       System.out.println("File not exist.");
       return;
@@ -33,14 +35,14 @@ public class StopStem {
       Scanner in = new Scanner(f);
       while(in.hasNext()) {
         String word = in.next();
-        stopwords.add(word);
+        stopWords.add(word);
       }
     } catch(FileNotFoundException e) {
       e.printStackTrace();
     }
   }
 
-  public static boolean isNumber(String str) {
+  private static boolean isNumber(String str) {
     try {
       double num = Double.parseDouble(str);
     } catch(NumberFormatException e) {
@@ -51,6 +53,15 @@ public class StopStem {
 
   public static String stem(String str) {
     return porter.stripAffixes(str);
+  }
+
+  public static String processWord(String str) {
+    if(isNumber(str) || isStopWord(str)) {
+      return "";
+    }
+    else {
+      return stem(str);
+    }
   }
 
 }

@@ -23,9 +23,9 @@ public class DataManager
 
 	private HTree hashtable;
 
-	DataManager(RecordManager recman, String objectname) throws IOException
+	public DataManager(RecordManager recman, String objectname) throws IOException
 	{
-		recman = RecordManagerFactory.createRecordManager(recordmanager);
+		//recman = RecordManagerFactory.createRecordManager(recordmanager);
 		long recid = recman.getNamedObject(objectname);
 			
 		if (recid != 0)
@@ -39,9 +39,14 @@ public class DataManager
 		}
 	}
 
-	public void addEntry(String keyword, Object x) throws IOException
+	public void addEntry(String keyword, int freq) throws IOException
 	{
-		hashtable.put(keyword, x);
+		hashtable.put(keyword, freq);
+	}
+
+	public void addObject(String keyword, Object obj) throws IOException
+	{
+		hashtable.put(keyword, obj);
 	}
 
 	public void delEntry(String word) throws IOException
@@ -52,6 +57,26 @@ public class DataManager
 	public Object getEntry(String keyword) throws IOException
 	{
 		return hashtable.get(keyword);
+	}
+
+	public HTree getHashTable() throws IOException
+	{
+		return hashtable;
+	}
+
+	public int getTableSize() throws IOException
+	{
+		FastIterator iter = hashtable.keys();
+		int count = 0;
+		while(iter.next() != null) {
+			count++;
+		}
+		return count;
+	}
+
+	public FastIterator getIterator() throws IOException
+	{
+		return getHashTable().keys();
 	}
 
 	public void printAll() throws IOException

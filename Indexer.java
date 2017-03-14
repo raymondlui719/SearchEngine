@@ -14,10 +14,17 @@ import java.util.StringTokenizer;
 import org.htmlparser.beans.LinkBean;
 import java.net.URL;
 
+import jdbm.RecordManager;
+
 
 public class Indexer {
 
-  private Page page;
+  // private RecordManager recman; // TODO: needed in phase 2
+
+  public Indexer() {
+    // empty constructor body
+    // TODO: index new page here in phase 2
+  }
 
   public static Vector<String> extractWords(String url) throws ParserException {
     Vector<String> words = new Vector<String>();
