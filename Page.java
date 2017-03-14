@@ -7,27 +7,28 @@ import org.htmlparser.util.ParserException;
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
 
-public class Page {
+public class Page implements Serializable {
 	private String url;
 	private String title;
 	private String pageId;
 	private long lastModification;
 	private long size;
-	private DataManager wordsFreqList;
+	private HashMap<String, Integer> word_tf;
 	private Vector<String> childLinks;
+
+	private static final long serialVersionUID = 3849687432103791608L;
 
 	public Page(RecordManager recman, String _url, String _pageId) throws ParserException, IOException {
 		url = _url;
 		pageId = _pageId;
-		String objectName = "termFreq" + pageId;
-		wordsFreqList = new DataManager(recman, objectName);
+		word_tf = new HashMap<String, Integer>();
 		initialize();
 	}
 
 	public Page(RecordManager recman, String _url) throws ParserException, IOException {
 		url = _url;
 		pageId = null;
-		wordsFreqList = new DataManager(recman, "termFreq");
+		word_tf = new HashMap<String, Integer>();
 		initialize();
 	}
 
@@ -42,11 +43,11 @@ public class Page {
 			size = uc.getContentLengthLong();
 		else
 			size = 0;
-		indexWordsFromPage();
+		calculateWordTF();
 		childLinks = Indexer.extractLinks(url);
 	}
 
-	public void indexWordsFromPage() throws ParserException, IOException {
+	public void calculateWordTF() throws ParserException, IOException {
 		Vector<String> words = Indexer.extractWords(this.url);
 		if(size == 0) {
 			size = words.size();
@@ -56,11 +57,11 @@ public class Page {
 			if(stemmedWord == null || stemmedWord.equals(""))
 				continue;
 			int tf = 0;
-			if(wordsFreqList.getEntry(stemmedWord) != null)
-				tf = ((int) wordsFreqList.getEntry(stemmedWord)) + 1;
+			if(word_tf.get(stemmedWord) != null)
+				tf = word_tf.get(stemmedWord) + 1;
 			else
 				tf = 1;
-			wordsFreqList.addEntry(stemmedWord, tf);
+			word_tf.put(stemmedWord, tf);
 		}
 	}
 
@@ -86,8 +87,8 @@ public class Page {
 	public String getPageLink() {
 		return url;
 	}
-	public DataManager getWordFreqList() {
-		return wordsFreqList;
+	public HashMap<String, Integer> getWordTF() {
+		return word_tf;
 	}
 	public Vector<String> getChildLinks() {
 		return childLinks;
