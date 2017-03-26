@@ -12,9 +12,9 @@ public class Page implements Serializable {
 	private String title;
 	private String pageId;
 	private long lastModification;
-	private long size;
-	private HashMap<String, Integer> word_tf;
-	private Vector<String> childLinks;
+	private long size;	// page size
+	private HashMap<String, Integer> word_tf;	// will handle separately later
+	private Vector<String> childLinks;			// will handle separately later
 
 	private static final long serialVersionUID = 3849687432103791608L;
 
@@ -28,14 +28,14 @@ public class Page implements Serializable {
 	public Page(RecordManager recman, String _url) throws ParserException, IOException {
 		url = _url;
 		pageId = null;
-		word_tf = new HashMap<String, Integer>();
+		word_tf = new HashMap<String, Integer>();	// will handle separately later
 		initialize();
 	}
 
 	public void initialize() throws ParserException, IOException {
 		title = Indexer.extractTitle(url);
 		URL m_url = new URL(url);
-		URLConnection uc = m_url.openConnection();	
+		URLConnection uc = m_url.openConnection();
 		lastModification = uc.getLastModified();
 		if(lastModification == 0)
 			lastModification = uc.getDate();
@@ -43,10 +43,11 @@ public class Page implements Serializable {
 			size = uc.getContentLengthLong();
 		else
 			size = 0;
-		calculateWordTF();
-		childLinks = Indexer.extractLinks(url);
+		calculateWordTF();	// will handle separately later
+		childLinks = Indexer.extractLinks(url);		// TODO: do this in spider instead
 	}
 
+	// TODO: extract this function to indexer.java
 	public void calculateWordTF() throws ParserException, IOException {
 		Vector<String> words = Indexer.extractWords(this.url);
 		if(size == 0) {

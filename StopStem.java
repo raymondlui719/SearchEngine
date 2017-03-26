@@ -26,6 +26,7 @@ public class StopStem {
     return stopWords.contains(str);
   }
 
+  // read stop words from file
   private static void readStopWords(Vector<String> stopWords) {
     File f = new File("./stopwords.txt");
     if(!f.exists()) {
@@ -43,6 +44,7 @@ public class StopStem {
     }
   }
 
+  // avoid handling numeric words
   private static boolean isNumber(String str) {
     try {
       double num = Double.parseDouble(str);
@@ -56,6 +58,7 @@ public class StopStem {
     return porter.stripAffixes(str);
   }
 
+  // utility function for stemming words in any scenario
   public static String processWord(String str) {
     if(isNumber(str) || isStopWord(str)) {
       return "";
