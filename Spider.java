@@ -135,12 +135,12 @@ public class Spider {
 
 		spider.indexing(startUrl, maxPage);
 
-		spider.finalize();
-
 		DataManager pageID = new DataManager(recman, "pageID");
 		DataManager pageInfo = new DataManager(recman, "pageInfo");
 		DataManager childLinks = new DataManager(recman, "childLinks");
 		
+		spider.finalize();
+
 		//pageID.printAll();
 		//pageInfo.printAll();
 		// String startUrlID = String.valueOf(pageID.getEntry(startUrl));
