@@ -14,7 +14,6 @@ public class Page implements Serializable {
 	private long lastModification;
 	private long size;	// page size
 	private HashMap<String, Integer> word_tf;	// will handle separately later
-	private Vector<String> childLinks;			// will handle separately later
 
 	private static final long serialVersionUID = 3849687432103791608L;
 
@@ -44,7 +43,6 @@ public class Page implements Serializable {
 		else
 			size = 0;
 		calculateWordTF();	// will handle separately later
-		childLinks = Indexer.extractLinks(url);		// TODO: do this in spider instead
 	}
 
 	// TODO: extract this function to indexer.java
@@ -90,9 +88,6 @@ public class Page implements Serializable {
 	}
 	public HashMap<String, Integer> getWordTF() {
 		return word_tf;
-	}
-	public Vector<String> getChildLinks() {
-		return childLinks;
 	}
 
 	public String toString() {

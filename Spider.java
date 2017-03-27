@@ -14,6 +14,7 @@ public class Spider {
 	private Indexer indexer;
 	private DataManager pageID;
 	private DataManager pageInfo;
+	private DataManager childLinks;
 	private int pageCount;
 
 	public Spider(String recordmanager) throws IOException {
@@ -21,6 +22,7 @@ public class Spider {
 		indexer = new Indexer();
 		pageID = new DataManager(recman, "pageID");		// URL to pageID mapping
 		pageInfo = new DataManager(recman, "pageInfo");	// pageID to page mapping
+		childLinks = new DataManager(recman, "childLinks"); // parent page ID to list of child page ID
 		pageCount = 0;
 	}
 
@@ -46,71 +48,104 @@ public class Spider {
 		Queue<String> processedLinks = new LinkedList<String>();
 		getData(processedLinks);
 		linksList.add(url);
+		int idCount = 0;
 		while(linksList.size() != 0 && processedLinks.size() < maxPage)
 		{
 			String pageUrl = linksList.remove();
 			String id = "";
 
-			if(!processedLinks.contains(pageUrl))
+			/*
+				For phase 2:
+				Before a page is fetched into the system, it must perform several checks:
+				If the URL doesn’t exist in the index, go ahead to retrieve the URL (DONE)
+				If the URL already exists in the index but the last modification date of the URL is later than that recorded in the index, 
+				go ahead to retrieve the URL; otherwise, ignore the URL (TODO)
+			*/
+			if(processedLinks.contains(pageUrl))
+				continue;
+
+			// get or assign pageID of/to pageUrl
+			if(pageID.getEntry(pageUrl) != null)
 			{
-				// get or assign pageID of/to pageUrl
-				if(pageID.getEntry(pageUrl) != null)
-				{
-					id = String.valueOf(pageID.getEntry(pageUrl));
-				}
-				else
-				{
-					id = String.format("%04d", pageCount+1);
-				}
-				// URL <==> pageID
-				pageID.addEntry(pageUrl, id);
-				Page page = new Page(recman, pageUrl, id);
-
-				// if we can actually connect to the page then do the following:
-				if(page.getPageTitle() != null)
-				{
-					// pageID ==> pageInfo
-					pageInfo.addEntry(id, page);
-					recman.commit();
-					
-					Vector<String> childLinks = Indexer.extractLinks(pageUrl);
-					for(String childLink: childLinks)
-					{
-						// TODO: check if childLink was processed before,
-						// i.e. check if childLink is instanceof processedLinks
-						// i.e. check if childLink is the anchored url of some links in processedLinks 
-						if(!processedLinks.contains(pageUrl))
-							linksList.add(childLink);
-					}
-
-					// mark link as processed
-					processedLinks.add(pageUrl);
-					System.out.println((pageCount + 1) + ". Processed " + pageUrl);
-					pageCount++;
-				}
-				else
-				{
-					System.out.println("Failed to connect page with https: " + pageUrl);
-					page = null;
-				}
+				id = String.valueOf(pageID.getEntry(pageUrl));
 			}
+			else
+			{
+				id = String.format("%04d", pageCount+1);
+			}
+			// URL <==> pageID
+			pageID.addEntry(pageUrl, id);
+			Page page = new Page(recman, pageUrl, id);
+
+			// if we can actually connect to the page then do the following:
+			if(page.getPageTitle() != null)
+			{
+				// pageID ==> pageInfo
+				pageInfo.addEntry(id, page);
+				//recman.commit();
+
+				/*
+					TODO: index the word to word ID and word ID to posting list table
+				*/
+				
+				Vector<String> links = Indexer.extractLinks(pageUrl);
+				Vector<String> links_without_dup = new Vector<String>(new LinkedHashSet<String>(links));
+				Vector<String> childLinks = new Vector<String>();
+				for(String link: links_without_dup)
+				{
+					// TODO: check if the child link was processed before,
+					// i.e. check if the child link is instanceof processedLinks
+					// i.e. check if the child link is the anchored url of some links in processedLinks
+					if(!processedLinks.contains(link)) {
+						linksList.add(link);
+						childLinks.add(link);
+					}
+				}
+
+				// index the child links of the given page
+				addChildLink(pageUrl, childLinks);
+
+				// mark link as processed
+				processedLinks.add(pageUrl);
+				System.out.println((pageCount + 1) + ". Processed " + pageUrl);
+				pageCount++;
+			}
+			else
+			{
+				System.out.println("Failed to connect page with https: " + pageUrl);
+				page = null;
+			}
+		}
+	}
+
+	// parent id --> Vector<String> child id (currently child url, need change)
+	public void addChildLink(String parentLink, Vector<String> links) throws IOException {
+		String parentID = String.valueOf(pageID.getEntry(parentLink));
+		if(parentID != null) {
+			childLinks.addEntry(parentID, links);
 		}
 	}
 
 	public static void main(String[] arg) throws IOException, ParserException {
 		String db = "Database";
 		String startUrl = "http://www.cse.ust.hk";
-		final int maxPage = 60;
+		final int maxPage = 30;
 
 		Spider spider = new Spider(db);
 
 		spider.indexing(startUrl, maxPage);
 
+		spider.finalize();
+
 		DataManager pageID = new DataManager(recman, "pageID");
 		DataManager pageInfo = new DataManager(recman, "pageInfo");
+		DataManager childLinks = new DataManager(recman, "childLinks");
 		
-		pageID.printAll();
-		pageInfo.printAll();
+		//pageID.printAll();
+		//pageInfo.printAll();
+		// String startUrlID = String.valueOf(pageID.getEntry(startUrl));
+		// Vector<String> links = (Vector<String>) childLinks.getEntry(startUrlID);
+		// System.out.println(links);
 
 		//HTree hashtable;
 		//FastIterator iter;
@@ -132,8 +167,5 @@ public class Spider {
 		// 		System.out.println(childLink);
 		// 	}
 		// }
-
-		spider.finalize();
-
 	}
 }
