@@ -12,6 +12,7 @@ CLASSES = \
 	PageAdapter.java \
 	Spider.java \
 	StopStem.java \
+	TestProgram.java \
 	./IRUtilities/Porter.java
 	
 default: classes
