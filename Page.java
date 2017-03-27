@@ -95,4 +95,8 @@ public class Page implements Serializable {
 		return childLinks;
 	}
 
+	public String toString() {
+		return ("URL: " + url + "\n" + "Title: " + title  + "\n" + "Page ID: " + pageId + "\n" + "Last Modification: " + getLastModification() + "\n" + "Page Size: " + size + "\n");
+	}
+
 }
