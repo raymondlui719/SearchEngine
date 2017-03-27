@@ -81,6 +81,7 @@ public class DataManager
 		while((key = (String) iter.next()) != null)
 		{
 			System.out.println(key + ": " + hashtable.get(key).toString());
+    System.out.println("----------------------------------------------");
 		}
 	}	
 	

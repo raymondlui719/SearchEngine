@@ -96,7 +96,7 @@ public class Page implements Serializable {
 	}
 
 	public String toString() {
-		return ("URL: " + url + "\n" + "Title: " + title  + "\n" + "Page ID: " + pageId + "\n" + "Last Modification: " + getLastModification() + "\n" + "Page Size: " + size + "\n");
+		return ("Title: " + title  + "\n" + "URL: " + url + "\n" + "Last Modification: " + getLastModification() + "\n" + "Page Size: " + size + "\n"+ "Page ID: " + pageId + "\n");
 	}
 
 }
