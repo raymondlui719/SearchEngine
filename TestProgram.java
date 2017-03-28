@@ -48,7 +48,7 @@ public class TestProgram {
         
         HTree pageInfoHashtable = pageInfo.getHashTable();
         HTree pageUrlHashtable = pageUrl.getHashTable(); 
-        HTree childLinksHashtable = childLinks.getHashTable();
+        //HTree childLinksHashtable = childLinks.getHashTable();
 	    FastIterator it = pageInfoHashtable.keys();
         String keyword = null;
         
@@ -59,9 +59,15 @@ public class TestProgram {
             System.out.println(pageCount + ": " + page.getPageTitle());
             System.out.println("URL: " + url);
             System.out.println(page.getLastModification()+", Page Size: "+page.getPageSize());
+            
             HashMap<String, Integer> word_tf = page.getWordTF();
             System.out.println(word_tf);
-
+            Vector<String> childId = (Vector<String>) childLinks.getEntry(keyword);
+            System.out.println("Children Links:");
+            for(String linkId: childId) {
+                String link = String.valueOf(pageUrl.getEntry(linkId));
+                System.out.println(link);
+            }
             System.out.println("---------------------------------------------------------------------");
         }
 		pw.close();
