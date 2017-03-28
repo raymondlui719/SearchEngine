@@ -4,6 +4,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.*;
+import java.lang.Integer;
 
 import java.util.*;
 
@@ -19,6 +21,8 @@ public class TestProgram {
     private Indexer indexer;
     private DataManager pageID;  
     private DataManager pageInfo;
+    private DataManager pageUrl;
+    private DataManager childLinks;
     private int pageCount = 0;
 
  
@@ -28,6 +32,8 @@ public class TestProgram {
 		indexer = new Indexer(recman);
 		pageID = new DataManager(recman, "pageID");		// URL to pageID mapping
 		pageInfo = new DataManager(recman, "pageInfo");	// pageID to page mapping
+        pageUrl = new DataManager (recman, "pageUrl");
+        childLinks = new DataManager(recman, "childLinks"); // parent page ID to list of child page ID
 	}
 
     public void finalize() throws IOException {
@@ -39,19 +45,25 @@ public class TestProgram {
         // Put the result into a txt file
         PrintStream pw = new PrintStream(new FileOutputStream("spider_result.txt"));
         System.setOut(pw);
-	    /*FastIterator it = pageID.getIterator();
-        String url = null;
-
-        while((url = (String) it.next()) != null) 
-		{
-			//String pageid = (String) pageID.getEntry(url);
-           
+        
+        HTree pageInfoHashtable = pageInfo.getHashTable();
+        HTree pageUrlHashtable = pageUrl.getHashTable(); 
+        HTree childLinksHashtable = childLinks.getHashTable();
+	    FastIterator it = pageInfoHashtable.keys();
+        String keyword = null;
+        
+        while((keyword = (String) it.next()) != null) 
+		{   Page page = (Page) pageInfoHashtable.get(keyword);
+            String url = (String) pageUrlHashtable.get(keyword);
             pageCount++;
-            System.out.println(pageCount +":URL " +url);
-            System.out.println("-----------------------------------------");
-   
-		}*/
-        pageInfo.printAll();
+            System.out.println(pageCount + ": " + page.getPageTitle());
+            System.out.println("URL: " + url);
+            System.out.println(page.getLastModification()+", Page Size: "+page.getPageSize());
+            HashMap<String, Integer> word_tf = page.getWordTF();
+            System.out.println(word_tf);
+
+            System.out.println("---------------------------------------------------------------------");
+        }
 		pw.close();
     }
 
