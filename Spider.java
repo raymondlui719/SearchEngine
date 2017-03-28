@@ -133,7 +133,7 @@ public class Spider {
 						pageUrl.addEntry(id, link);
 						childIDs.add(id);
 						
-						Vector<String> words = Indexer.extractWords(pageUrl);
+						Vector<String> words = Indexer.extractWords(onePage);
                 
 						for(String w : words){
 						    String stemmedWord = StopStem.processWord(w);
@@ -152,7 +152,7 @@ public class Spider {
 						    wordID.addEntry(stemmedWord,word_id);
 						    HashMap<String, Integer> word_tf = page.getWordTF();
 						    int tf = word_tf.get(stemmedWord);
-
+						}
 					}
 				}
 
