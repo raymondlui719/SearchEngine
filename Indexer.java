@@ -20,11 +20,11 @@ import jdbm.RecordManager;
 
 public class Indexer {
 
-    // private RecordManager recman; // TODO: needed in phase 2
+    private RecordManager recman; // TODO: needed in phase 2
 
-    public Indexer() {
-        // empty constructor body
+    public Indexer(RecordManager _recman) {
         // TODO: index new page here in phase 2
+        recman = _recman;
     }
 
     public static Vector<String> extractWords(String url) {

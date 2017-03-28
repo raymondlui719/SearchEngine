@@ -7,16 +7,16 @@ import java.util.Vector;
 import java.io.IOException;
 import java.io.Serializable;
 
-// class Posting implements Serializable
-// {
-// 	public String keyword;
-// 	public int freq;
-// 	Posting(String keyword, int freq)
-// 	{
-// 		this.keyword = keyword;
-// 		this.freq = freq;
-// 	}
-// }
+class Posting implements Serializable
+{
+	public String keyword;
+	public int freq;
+	Posting(String keyword, int freq)
+	{
+		this.keyword = keyword;
+		this.freq = freq;
+	}
+}
 
 public class DataManager
 {
