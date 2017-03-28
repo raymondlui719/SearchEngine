@@ -28,8 +28,8 @@ public class Spider {
 		pageUrl = new DataManager(recman, "pageUrl");	// page ID to URL mapping
 		pageInfo = new DataManager(recman, "pageInfo");	// pageID to page mapping
 		childLinks = new DataManager(recman, "childLinks"); // parent page ID to list of child page ID
-		wordID = new DataManager(recman, "wordID");	// URL to pageID mapping
-       		wordInfo = new DataManager(recman, "wordInfo");	// URL to page mapping
+		wordID = new DataManager(recman, "wordID");	// word to wordID mapping
+       		wordInfo = new DataManager(recman, "wordInfo");	// wordID to  mapping
 		pageCount = 0;
 		wordCount = 0;
 		
@@ -133,15 +133,15 @@ public class Spider {
 						pageUrl.addEntry(id, link);
 						childIDs.add(id);
 						
-						Vector<String> words = Indexer.extractWords(onePage);
-                
+						
+						Vector<String> words = Indexer.extractWords(onePage);	
 						for(String w : words){
 						    String stemmedWord = StopStem.processWord(w);
 						    String word_id = "";
 						    if(stemmedWord == null || stemmedWord.equals("")){
 							continue;
 						    }
-
+							// check if the word is in wordID already
 
 							if(wordID.getEntry(stemmedWord) ==null){
 							    word_id = String.format("%04d", wordCount++);
@@ -149,6 +149,7 @@ public class Spider {
 							}else{
 							    word_id = String.valueOf(wordID.getEntry(stemmedWord));
 							}
+							// word ==> wordID
 						    wordID.addEntry(stemmedWord,word_id);
 						    HashMap<String, Integer> word_tf = page.getWordTF();
 						    int tf = word_tf.get(stemmedWord);
