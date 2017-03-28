@@ -41,7 +41,7 @@ public class Spider {
 		while( (url = (String)it.next()) != null) {
 			processed.add(url);
 			pageCount++;
-			System.out.println(pageCount + ". URL " + url + " initially processed");
+			//System.out.println(pageCount + ". URL " + url + " initially processed");
 		}
 	}
 
@@ -55,15 +55,6 @@ public class Spider {
 			String onePage = linksList.remove();
 			String id = "";
 
-			/*
-				For phase 2:
-				Before a page is fetched into the system, it must perform several checks:
-				If the URL doesn’t exist in the index, go ahead to retrieve the URL (DONE)
-				If the URL already exists in the index but the last modification date of the URL is later than that recorded in the index, 
-				go ahead to retrieve the URL; otherwise, ignore the URL (TODO)
-			*/
-			if(processedLinks.contains(onePage))
-				continue;
 
 			// get or assign pageID of/to onePage
 			if(pageID.getEntry(onePage) != null)
@@ -75,11 +66,30 @@ public class Spider {
 				id = String.format("%04d", pageCount++);
 			}
 
+			/*
+				If the URL already exists in the index but the last modification date 
+				of the URL is later than that recorded in the index, 
+				go ahead to retrieve the URL; otherwise, ignore the URL
+			*/
+
 			Page page = new Page(recman, onePage, id);
+
+			Page oldPage = null;
+			if(pageInfo.getEntry(id) != null) {
+				oldPage = (Page) pageInfo.getEntry(id);
+			}
+
+			if(processedLinks.contains(onePage)
+				&& oldPage != null
+				&& oldPage.getLastModificationLong() != 0 
+				&& oldPage.getLastModificationLong() >= page.getLastModificationLong()) {
+				continue;
+			}
 
 			// if we can actually connect to the page then do the following:
 			if(page.getPageTitle() != null)
 			{
+
 				// URL <==> pageID
 				pageID.addEntry(onePage, id);
 				pageUrl.addEntry(id, onePage);
@@ -91,6 +101,8 @@ public class Spider {
 				/*
 					TODO: index the word to word ID and word ID to posting list table
 				*/
+				indexer.indexNewPage(onePage, id);
+
 				
 				Vector<String> links = Indexer.extractLinks(onePage);
 				Vector<String> links_without_dup = new Vector<String>(new LinkedHashSet<String>(links));

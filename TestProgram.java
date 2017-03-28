@@ -25,7 +25,7 @@ public class TestProgram {
     public TestProgram(String database) throws IOException {
         // Open the database
 		recman = RecordManagerFactory.createRecordManager(database);
-		indexer = new Indexer();
+		indexer = new Indexer(recman);
 		pageID = new DataManager(recman, "pageID");		// URL to pageID mapping
 		pageInfo = new DataManager(recman, "pageInfo");	// pageID to page mapping
 	}

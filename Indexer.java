@@ -27,6 +27,10 @@ public class Indexer {
         recman = _recman;
     }
 
+    public void indexNewPage(String pageUrl, String pageID) {
+
+    }
+
     public static Vector<String> extractWords(String url) {
         Vector<String> words = new Vector<String>();
         StringBean sb = new StringBean();
