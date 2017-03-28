@@ -29,7 +29,7 @@ public class Spider {
 		pageInfo = new DataManager(recman, "pageInfo");	// pageID to page mapping
 		childLinks = new DataManager(recman, "childLinks"); // parent page ID to list of child page ID
 		
-
+	}
 	public void finalize() throws IOException {
 		recman.commit();
 		recman.close();
