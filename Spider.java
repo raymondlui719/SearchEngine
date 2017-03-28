@@ -17,6 +17,9 @@ public class Spider {
 	private DataManager pageInfo;	// page information of the indexed pages (those 30 pages)
 	private DataManager childLinks;
 	private int pageCount;
+	private DataManager wordID;
+    	private DataManager wordInfo;
+    	private int wordCount;
 
 	public Spider(String recordmanager) throws IOException {
 		recman = RecordManagerFactory.createRecordManager(recordmanager);
@@ -25,6 +28,10 @@ public class Spider {
 		pageUrl = new DataManager(recman, "pageUrl");	// page ID to URL mapping
 		pageInfo = new DataManager(recman, "pageInfo");	// pageID to page mapping
 		childLinks = new DataManager(recman, "childLinks"); // parent page ID to list of child page ID
+		wordID = new DataManager(recman, "wordID");	// URL to pageID mapping
+       		wordInfo = new DataManager(recman, "wordInfo");	// URL to page mapping
+		
+`		wordCount = 0;
 		pageCount = 0;
 	}
 
@@ -126,6 +133,27 @@ public class Spider {
 						pageID.addEntry(link, id);
 						pageUrl.addEntry(id, link);
 						childIDs.add(id);
+						
+						Vector<String> words = Indexer.extractWords(pageUrl);
+                
+						for(String w : words){
+						    String stemmedWord = StopStem.processWord(w);
+						    String word_id = "";
+						    if(stemmedWord == null || stemmedWord.equals("")){
+							continue;
+						    }
+
+
+							if(wordID.getEntry(stemmedWord) ==null){
+							    word_id = String.format("%04d", wordCount++);
+
+							}else{
+							    word_id = String.valueOf(wordID.getEntry(stemmedWord));
+							}
+						    wordID.addEntry(stemmedWord,word_id);
+						    HashMap<String, Integer> word_tf = page.getWordTF();
+						    int tf = word_tf.get(stemmedWord);
+
 					}
 				}
 
@@ -164,7 +192,9 @@ public class Spider {
 		DataManager pageUrl = new DataManager(recman, "pageUrl");
 		DataManager pageInfo = new DataManager(recman, "pageInfo");
 		DataManager childLinks = new DataManager(recman, "childLinks");
-
+		DataManager wordID = new DataManager(recman, "wordID");
+       		DataManager WordInfo = new DataManager(recman, "wordInfo");
+		
 		childLinks.printAll();
 		
 		spider.finalize();
