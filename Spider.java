@@ -17,9 +17,6 @@ public class Spider {
 	private DataManager pageInfo;	// page information of the indexed pages (those 30 pages)
 	private DataManager childLinks;
 	private int pageCount;
-	private DataManager wordID;
-    	private DataManager wordInfo;
-    	private int wordCount;
 
 	public Spider(String recordmanager) throws IOException {
 		recman = RecordManagerFactory.createRecordManager(recordmanager);
@@ -28,10 +25,7 @@ public class Spider {
 		pageUrl = new DataManager(recman, "pageUrl");	// page ID to URL mapping
 		pageInfo = new DataManager(recman, "pageInfo");	// pageID to page mapping
 		childLinks = new DataManager(recman, "childLinks"); // parent page ID to list of child page ID
-		wordID = new DataManager(recman, "wordID");	// word to wordID mapping
-       		wordInfo = new DataManager(recman, "wordInfo");	// wordID to  mapping
 		pageCount = 0;
-		wordCount = 0;
 		
 	}
 	public void finalize() throws IOException {
@@ -72,12 +66,6 @@ public class Spider {
 				id = String.format("%04d", pageCount++);
 			}
 
-			/*
-				If the URL already exists in the index but the last modification date 
-				of the URL is later than that recorded in the index, 
-				go ahead to retrieve the URL; otherwise, ignore the URL
-			*/
-
 			Page page = new Page(recman, onePage, id);
 
 			Page oldPage = null;
@@ -85,6 +73,11 @@ public class Spider {
 				oldPage = (Page) pageInfo.getEntry(id);
 			}
 
+			/*
+				If the URL already exists in the index but the last modification date 
+				of the URL is later than that recorded in the index, 
+				go ahead to retrieve the URL; otherwise, ignore the URL
+			*/
 			if(processedLinks.contains(onePage)
 				&& oldPage != null
 				&& oldPage.getLastModificationLong() != 0 
@@ -109,7 +102,6 @@ public class Spider {
 				*/
 				indexer.indexNewPage(onePage, id);
 
-				
 				Vector<String> links = Indexer.extractLinks(onePage);
 				Vector<String> links_without_dup = new Vector<String>(new LinkedHashSet<String>(links));
 				Vector<String> childIDs = new Vector<String>();
@@ -134,26 +126,6 @@ public class Spider {
 						childIDs.add(id);
 						
 						
-						Vector<String> words = Indexer.extractWords(onePage);	
-						for(String w : words){
-						    String stemmedWord = StopStem.processWord(w);
-						    String word_id = "";
-						    if(stemmedWord == null || stemmedWord.equals("")){
-							continue;
-						    }
-							// check if the word is in wordID already
-
-							if(wordID.getEntry(stemmedWord) ==null){
-							    word_id = String.format("%04d", wordCount++);
-
-							}else{
-							    word_id = String.valueOf(wordID.getEntry(stemmedWord));
-							}
-							// word ==> wordID
-						    wordID.addEntry(stemmedWord,word_id);
-						    HashMap<String, Integer> word_tf = page.getWordTF();
-						    int tf = word_tf.get(stemmedWord);
-						}
 					}
 				}
 
@@ -187,44 +159,7 @@ public class Spider {
 		Spider spider = new Spider(db);
 
 		spider.indexing(startUrl, maxPage);
-
-		DataManager pageID = new DataManager(recman, "pageID");
-		DataManager pageUrl = new DataManager(recman, "pageUrl");
-		DataManager pageInfo = new DataManager(recman, "pageInfo");
-		DataManager childLinks = new DataManager(recman, "childLinks");
-		DataManager wordID = new DataManager(recman, "wordID");
-       		DataManager WordInfo = new DataManager(recman, "wordInfo");
-		
-		
-		childLinks.printAll();
 		
 		spider.finalize();
-
-		//pageID.printAll();
-		//pageInfo.printAll();
-		// String startUrlID = String.valueOf(pageID.getEntry(startUrl));
-		// Vector<String> links = (Vector<String>) childLinks.getEntry(startUrlID);
-		// System.out.println(links);
-
-		//HTree hashtable;
-		//FastIterator iter;
-		//String keyword;
-
-		//hashtable = pageInfo.getHashTable();
-		//iter = hashtable.keys();
-		//keyword = null;
-		// while((keyword = (String)iter.next()) != null) {
-		// 	Page page = (Page) hashtable.get(keyword);
-		// 	System.out.println(keyword);
-		// 	System.out.println(page.getPageTitle());
-		// 	System.out.print(page.getLastModification());
-		// 	System.out.println(", " + page.getPageSize());
-		// 	HashMap<String, Integer> word_tf = page.getWordTF();
-		// 	System.out.println(word_tf);
-		// 	Vector<String> childLinks = page.getChildLinks();
-		// 	for(String childLink: childLinks) {
-		// 		System.out.println(childLink);
-		// 	}
-		// }
 	}
 }

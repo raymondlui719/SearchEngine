@@ -13,21 +13,18 @@ public class Page implements Serializable {
 	private String pageId;
 	private long lastModification;
 	private long size;	// page size
-	private HashMap<String, Integer> word_tf;	// will handle separately later
 
 	private static final long serialVersionUID = 3849687432103791608L;
 
 	public Page(RecordManager recman, String _url, String _pageId) throws ParserException, IOException {
 		url = _url;
 		pageId = _pageId;
-		word_tf = new HashMap<String, Integer>();
 		initialize();
 	}
 
 	public Page(RecordManager recman, String _url) throws ParserException, IOException {
 		url = _url;
 		pageId = null;
-		word_tf = new HashMap<String, Integer>();	// will handle separately later
 		initialize();
 	}
 
@@ -40,27 +37,9 @@ public class Page implements Serializable {
 			lastModification = uc.getDate();
 		if(uc.getContentLengthLong() > 0)
 			size = uc.getContentLengthLong();
-		else
-			size = 0;
-		calculateWordTF();	// will handle separately later
-	}
-
-	// TODO: extract this function to indexer.java
-	public void calculateWordTF() throws ParserException, IOException {
-		Vector<String> words = Indexer.extractWords(this.url);
-		if(size == 0) {
+		else {
+			Vector<String> words = Indexer.extractWords(this.url);
 			size = words.size();
-		}
-		for(String w: words) {
-			String stemmedWord = StopStem.processWord(w);
-			if(stemmedWord == null || stemmedWord.equals(""))
-				continue;
-			int tf = 0;
-			if(word_tf.get(stemmedWord) != null)
-				tf = word_tf.get(stemmedWord) + 1;
-			else
-				tf = 1;
-			word_tf.put(stemmedWord, tf);
 		}
 	}
 
@@ -85,9 +64,6 @@ public class Page implements Serializable {
 	}
 	public String getPageLink() {
 		return url;
-	}
-	public HashMap<String, Integer> getWordTF() {
-		return word_tf;
 	}
 
 	public String toString() {

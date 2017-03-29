@@ -16,6 +16,7 @@ import jdbm.RecordManagerFactory;
 import jdbm.helper.FastIterator;
 import jdbm.htree.HTree;
 
+@SuppressWarnings("unchecked")
 public class TestProgram {
     private static RecordManager recman;
     private Indexer indexer;
@@ -23,7 +24,11 @@ public class TestProgram {
     private DataManager pageInfo;
     private DataManager pageUrl;
     private DataManager childLinks;
-    private int pageCount = 0;
+    private DataManager wordID;
+    private DataManager idWord;
+    private DataManager wordInfo;
+    private DataManager pageWord;
+    private int pageCount;
 
  
     public TestProgram(String database) throws IOException {
@@ -34,6 +39,11 @@ public class TestProgram {
 		pageInfo = new DataManager(recman, "pageInfo");	// pageID to page mapping
         pageUrl = new DataManager (recman, "pageUrl");
         childLinks = new DataManager(recman, "childLinks"); // parent page ID to list of child page ID
+        wordID = new DataManager(recman, "wordID");
+        idWord = new DataManager(recman, "idWord");
+        wordInfo = new DataManager(recman, "wordInfo");
+        pageWord = new DataManager(recman, "pageWord");
+        pageCount = 0;
 	}
 
     public void finalize() throws IOException {
@@ -48,23 +58,34 @@ public class TestProgram {
         
         HTree pageInfoHashtable = pageInfo.getHashTable();
         HTree pageUrlHashtable = pageUrl.getHashTable(); 
-        //HTree childLinksHashtable = childLinks.getHashTable();
 	    FastIterator it = pageInfoHashtable.keys();
-        String keyword = null;
+        String pageID = null;
         
-        while((keyword = (String) it.next()) != null) 
-		{   Page page = (Page) pageInfoHashtable.get(keyword);
-            String url = (String) pageUrlHashtable.get(keyword);
+        while((pageID = (String) it.next()) != null) 
+		{
+            Page page = (Page) pageInfoHashtable.get(pageID);
             pageCount++;
             System.out.println(pageCount + ": " + page.getPageTitle());
-            System.out.println("URL: " + url);
-            System.out.println(page.getLastModification()+", Page Size: "+page.getPageSize());
-            
-            HashMap<String, Integer> word_tf = page.getWordTF();
-            System.out.println(word_tf);
-            Vector<String> childId = (Vector<String>) childLinks.getEntry(keyword);
+            System.out.println(page.getURL());
+            System.out.println(page.getLastModification() + ", " + page.getPageSize());
+
+            Vector<String> keywordIDs = (Vector<String>) pageWord.getEntry(pageID);
+            for(String id: keywordIDs)
+            {
+                String word = String.valueOf(idWord.getEntry(id));
+                Vector<Posting> pList = (Vector<Posting>) wordInfo.getEntry(id);
+                for(Posting p: pList) {
+                    if(p.pageID.equals(pageID)) {
+                        System.out.print(word + " " + p.freq + "; ");
+                    }
+                }
+            }
+            System.out.println();
+
+            Vector<String> childId = (Vector<String>) childLinks.getEntry(pageID);
             System.out.println("Children Links:");
-            for(String linkId: childId) {
+            for(String linkId: childId)
+            {
                 String link = String.valueOf(pageUrl.getEntry(linkId));
                 System.out.println(link);
             }
