@@ -1,30 +1,25 @@
 Search Engine:
 
+Note:
 1. Use "make clean" to delete class files
 
 2. Use "make" to create class files
 
 3. Create an alias in your computer, e.g. "jSpider" with the following command:
-
    "java -cp jdbm-1.0.jar:htmlparser.jar:. Spider"
+   Then you can simply run the Spider by typing "jSpider"
 
-4. Then you can simply run the Spider by typing "jSpider"
+To run Spider:
+1. Run "make"
 
-Run Test Program:
+2. Run "java -cp jdbm-1.0.jar:htmlparser.jar:. Spider"
 
-1. Use "make clean" to delete class files
+To run the Test Program:
+1. Run spider first
 
-2. Use "make" to create class files
+2. Run "java -cp jdbm-1.0.jar:htmlparser.jar:. TestProgram"
 
-3. Create an alias in your computer, e.g. "jSpider" with the following command:
-
-   "java -cp jdbm-1.0.jar:htmlparser.jar:. Spider"
-
-4. Then run the TestProgram by typing the following command:
-
-   "java -cp jdbm-1.0.jar:htmlparser.jar:. TestProgram"
-
-5. A txt file with the result is generated and placed in your folder.
+3. A txt file named "spider_result.txt" would then be generated in the same directory.
 
 Teammates (Work distribution):
 Chan Man Yee(20278380) 25% 
