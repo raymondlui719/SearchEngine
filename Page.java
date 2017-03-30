@@ -2,7 +2,7 @@
 import java.io.*;
 import java.util.*;
 import java.net.URL;
-import java.net.URLConnection;	
+import java.net.URLConnection;
 import org.htmlparser.util.ParserException;
 import jdbm.RecordManager;
 import jdbm.RecordManagerFactory;
@@ -31,10 +31,12 @@ public class Page implements Serializable {
 	public void initialize() throws ParserException, IOException {
 		title = Indexer.extractTitle(url);
 		URL m_url = new URL(url);
-		URLConnection uc = m_url.openConnection();
+		URLConnection uc =  m_url.openConnection();
 		lastModification = uc.getLastModified();
-		if(lastModification == 0)
-			lastModification = uc.getDate();
+		if(lastModification == 0) {
+			lastModification = 0;
+		}
+
 		if(uc.getContentLengthLong() > 0)
 			size = uc.getContentLengthLong();
 		else {
@@ -47,7 +49,7 @@ public class Page implements Serializable {
 		return lastModification;
 	}
 	public Date getLastModification() {
-		if(lastModification == 0) return null;
+		if(lastModification == 0) return new Date(System.currentTimeMillis());
 		return new Date(lastModification);
 	}
 	public String getURL() {

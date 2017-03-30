@@ -80,7 +80,6 @@ public class Spider {
 			*/
 			if(processedLinks.contains(onePage)
 				&& oldPage != null
-				&& oldPage.getLastModificationLong() != 0 
 				&& oldPage.getLastModificationLong() >= page.getLastModificationLong()) {
 				continue;
 			}
@@ -153,7 +152,7 @@ public class Spider {
 
 	public static void main(String[] arg) throws IOException, ParserException {
 		String db = "Database";
-		String startUrl = "http://www.cse.ust.hk";
+		String startUrl = "http://www.cse.ust.hk/";
 		final int maxPage = 30;
 
 		Spider spider = new Spider(db);
