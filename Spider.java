@@ -16,6 +16,7 @@ public class Spider {
 	private DataManager pageUrl;
 	private DataManager pageInfo;	// page information of the indexed pages (those 30 pages)
 	private DataManager childLinks;
+    private DataManager parentLinks;
 	private int pageCount;
 
 	public Spider(String recordmanager) throws IOException {
@@ -25,6 +26,7 @@ public class Spider {
 		pageUrl = new DataManager(recman, "pageUrl");	// page ID to URL mapping
 		pageInfo = new DataManager(recman, "pageInfo");	// pageID to page mapping
 		childLinks = new DataManager(recman, "childLinks"); // parent page ID to list of child page ID
+        parentLinks = new DataManager(recman,"parentLinks"); // child page ID to list of parent page ID
 		pageCount = 0;
 		
 	}
@@ -87,7 +89,7 @@ public class Spider {
 			// if we can actually connect to the page then do the following:
 			if(page.getPageTitle() != null)
 			{
-
+                String cid = "";
 				// URL <==> pageID
 				pageID.addEntry(onePage, id);
 				pageUrl.addEntry(id, onePage);
@@ -114,17 +116,16 @@ public class Spider {
 						linksList.add(link);
 						// index the child links
 						if(pageID.getEntry(link) != null) {
-							id = String.valueOf(pageID.getEntry(link));
+							cid = String.valueOf(pageID.getEntry(link));
 						}
 						else {
-							id = String.format("%04d", pageCount++);
+							cid = String.format("%04d", pageCount++);
 						}
 						// URL <==> pageID
-						pageID.addEntry(link, id);
-						pageUrl.addEntry(id, link);
-						childIDs.add(id);
-						
-						
+						pageID.addEntry(link, cid);
+						pageUrl.addEntry(cid, link);
+						childIDs.add(cid);
+						addParentLink(cid,id);		
 					}
 				}
 
@@ -150,7 +151,27 @@ public class Spider {
 		}
 	}
 
-	public static void main(String[] arg) throws IOException, ParserException {
+    // child page ID -> Vector<String> parent id
+    public void addParentLink(String childId, String parentId) throws IOException {
+        Vector<String> parents;
+        // childID is not existed in parentLinks
+        if (parentLinks.getEntry(childId) == null)
+        {
+            parents = new Vector<String>();
+            parents.add(parentId);
+
+        } else {
+            
+            parents = (Vector<String>)parentLinks.getEntry(childId);
+            if (!parents.contains(parentId)) {
+                parents.add(parentId);
+            }
+            
+        }
+        parentLinks.addEntry(childId, parents);
+
+    }
+   	public static void main(String[] arg) throws IOException, ParserException {
 		String db = "Database";
 		String startUrl = "http://www.cse.ust.hk/";
 		final int maxPage = 30;

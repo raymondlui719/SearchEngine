@@ -24,6 +24,7 @@ public class TestProgram {
     private DataManager pageInfo;
     private DataManager pageUrl;
     private DataManager childLinks;
+    private DataManager parentLinks;
     private DataManager wordID;
     private DataManager idWord;
     private DataManager wordInfo;
@@ -39,6 +40,7 @@ public class TestProgram {
 		pageInfo = new DataManager(recman, "pageInfo");	// pageID to page mapping
         pageUrl = new DataManager (recman, "pageUrl");
         childLinks = new DataManager(recman, "childLinks"); // parent page ID to list of child page ID
+        parentLinks = new DataManager(recman,"parentLinks"); // child page ID to list of parent page ID
         wordID = new DataManager(recman, "wordID");
         idWord = new DataManager(recman, "idWord");
         wordInfo = new DataManager(recman, "wordInfo");
@@ -81,7 +83,14 @@ public class TestProgram {
                 }
             }
             System.out.println();
+            Vector<String> parentsId = (Vector<String>) parentLinks.getEntry(pageID);
+            System.out.println("Parents Links:");
+            for(String linkId: parentsId)
+            {
+                String link = String.valueOf(pageUrl.getEntry(linkId));
 
+                System.out.println(link);
+            }
             Vector<String> childId = (Vector<String>) childLinks.getEntry(pageID);
             System.out.println("Children Links:");
             for(String linkId: childId)
