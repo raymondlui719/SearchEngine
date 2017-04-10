@@ -1,0 +1,88 @@
+*{
+	margin:0;
+	padding:0;
+}
+
+body{
+	font-size:13px;
+	color:#eee;
+	font-family:Arial, Helvetica, sans-serif;
+	background:url('img/bg.jpg') repeat-x #718693;
+}
+
+
+
+#page{
+	/* The main container div */
+	width:620px;
+	margin-left: 250px;
+	margin-top: 30px;
+}
+
+
+#searchForm{
+	/* The search form. */
+	background-color:#4C5A65;
+	padding:50px 10px ;
+
+	
+}
+
+fieldset{
+	border:none;
+}
+
+img{
+	float:left;
+	margin-top: 30px;
+	margin-left: 10px;
+	
+}
+#searchInputContainer{
+	/* This div contains the transparent search box */
+	width:420px;
+	height:36px;
+	background:url("img/searchBox.png") no-repeat;
+	float:left;
+	margin-right:60px;
+}
+
+#s{
+	/* The search text box. */
+	
+	border:none;
+	color:#888888;
+	background:url("img/searchBox.png") no-repeat;
+	background-size: 100%;
+	font-family:Arial,Helvetica,sans-serif;
+	font-size:15px;
+	height:40px;
+	line-height:36px;
+	margin-left:40px;
+	outline:medium none;
+	text-shadow:1px 1px 0 white;
+	width:460px;
+	margin-right: 30px;
+	padding-left: 40px;
+}
+
+/* The UL that contains the search type icons */
+
+
+#submitButton{
+	background:url('img/buttons.png') no-repeat;
+	width:83px;
+	height:36px;
+	text-indent:-9999px;
+	overflow:hidden;
+	text-transform:uppercase;
+	border:none;
+	cursor:pointer;
+}
+
+#submitButton:hover{
+	background-position:left bottom;
+}
+
+
+
