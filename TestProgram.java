@@ -111,12 +111,16 @@ public class TestProgram {
 
             Vector<String> parentsId = (Vector<String>) parentLinks.getEntry(pageID);
             System.out.println("Parents Links:");
-            for(String linkId: parentsId)
-            {
-                String link = String.valueOf(pageUrl.getEntry(linkId));
+            try {
+	        for(String linkId: parentsId)
+                {
+                    String link = String.valueOf(pageUrl.getEntry(linkId));
 
-                System.out.println(link);
-            }
+                    System.out.println(link);
+                }
+	    } catch(NullPointerException ex) {
+		System.out.println("None");
+	    }
             Vector<String> childId = (Vector<String>) childLinks.getEntry(pageID);
             System.out.println("Children Links:");
             for(String linkId: childId)
