@@ -38,9 +38,9 @@ public class Indexer {
     public void indexNewPage(String pageUrl, String pageID) throws IOException {
         Vector<String> words = Indexer.extractWords(pageUrl);
         Vector<String> keywords = new Vector<String>();
-        for(String w : words)
+        for(int i = 0; i < words.size(); i++)
         {
-            String stem = StopStem.processWord(w);
+            String stem = StopStem.processWord(words.get(i));
             String word_id;
             if(stem == null || stem.equals(""))
                 continue;
@@ -54,7 +54,9 @@ public class Indexer {
                 wordID.addEntry(stem, word_id);
                 idWord.addEntry(word_id, stem);
                 Vector<Posting> pList = new Vector<Posting>();
-                pList.add(new Posting(pageID, 1));
+                Vector<Integer> word_pos = new Vector<Integer>();
+                word_pos.add(i);
+                pList.add(new Posting(pageID, 1, word_pos));
                 // word ID --> Posting list
                 wordInfo.addEntry(word_id, pList);
             }
@@ -73,18 +75,24 @@ public class Indexer {
                         if(p.pageID.equals(pageID))
                         {
                             p.freq++;
+                            p.word_pos.add(i);
                             processed = true;
                             break;
                         }
                     }
-                    if(!processed)
-                        pList.add(new Posting(pageID, 1));
+                    if(!processed) {
+                        Vector<Integer> word_pos = new Vector<Integer>();
+                        word_pos.add(i);
+                        pList.add(new Posting(pageID, 1, word_pos));
+                    }
                     wordInfo.addEntry(word_id, pList);
                 }
                 else
                 {
                     Vector<Posting> pList = new Vector<Posting>();
-                    pList.add(new Posting(pageID, 1));
+                    Vector<Integer> word_pos = new Vector<Integer>();
+                    word_pos.add(i);
+                    pList.add(new Posting(pageID, 1, word_pos));
                     wordInfo.addEntry(word_id, pList);
                 }
             }
