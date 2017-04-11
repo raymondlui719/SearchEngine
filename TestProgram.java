@@ -26,9 +26,13 @@ public class TestProgram {
     private DataManager childLinks;
     private DataManager parentLinks;
     private DataManager wordID;
-    private DataManager idWord;
-    private DataManager wordInfo;
-    private DataManager pageWord;
+    private DataManager word;
+    private DataManager bodyWord;
+    private DataManager titleWord;
+    private DataManager pageBodyWord;
+    private DataManager pageTitleWord;
+    private DataManager pageBodyMaxTF;
+    private DataManager pageTitleMaxTF;
     private int pageCount;
 
  
@@ -41,10 +45,14 @@ public class TestProgram {
         pageUrl = new DataManager (recman, "pageUrl");
         childLinks = new DataManager(recman, "childLinks"); // parent page ID to list of child page ID
         parentLinks = new DataManager(recman,"parentLinks"); // child page ID to list of parent page ID
-        wordID = new DataManager(recman, "wordID");
-        idWord = new DataManager(recman, "idWord");
-        wordInfo = new DataManager(recman, "wordInfo");
-        pageWord = new DataManager(recman, "pageWord");
+        wordID = new DataManager(recman, "wordID");     // word --> word-id
+        word = new DataManager(recman, "word");     // word-id --> word
+        bodyWord = new DataManager(recman, "bodyWord"); // word-id --> {page-id, tf}
+        titleWord = new DataManager(recman, "titleWord");   
+        pageBodyWord = new DataManager(recman, "pageBodyWord"); // forward index (page-id --> {keywords})
+        pageTitleWord = new DataManager(recman, "pageTitleWord");
+        pageBodyMaxTF = new DataManager(recman, "pageBodyMaxTF");   // forward index (page-id --> max tf)
+        pageTitleMaxTF = new DataManager(recman, "pageTitleMaxTF");
         pageCount = 0;
 	}
 
@@ -70,19 +78,37 @@ public class TestProgram {
             System.out.println(pageCount + ": " + page.getPageTitle());
             System.out.println(page.getURL());
             System.out.println(page.getLastModification() + ", " + page.getPageSize());
+            int bodyMaxTF = (int) pageBodyMaxTF.getEntry(pageID);
+            System.out.println("Max term frequency (body): " + bodyMaxTF);
+            int titleMaxTF = (int) pageTitleMaxTF.getEntry(pageID);
+            System.out.println("Max term frequency (title): " + titleMaxTF);
 
-            Vector<String> keywordIDs = (Vector<String>) pageWord.getEntry(pageID);
-            for(String id: keywordIDs)
+            Vector<String> titleWordIDs = (Vector<String>) pageTitleWord.getEntry(pageID);
+            for(String tid: titleWordIDs)
             {
-                String word = String.valueOf(idWord.getEntry(id));
-                Vector<Posting> pList = (Vector<Posting>) wordInfo.getEntry(id);
+                String w = String.valueOf(word.getEntry(tid));
+                Vector<Posting> pList = (Vector<Posting>) titleWord.getEntry(tid);
                 for(Posting p: pList) {
                     if(p.pageID.equals(pageID)) {
-                        System.out.print(word + " " + p.freq + "; ");
+                        System.out.print(w + " " + p.freq + "; ");
                     }
                 }
             }
             System.out.println();
+
+            Vector<String> bodyWordIDs = (Vector<String>) pageBodyWord.getEntry(pageID);
+            for(String bid: bodyWordIDs)
+            {
+                String w = String.valueOf(word.getEntry(bid));
+                Vector<Posting> pList = (Vector<Posting>) bodyWord.getEntry(bid);
+                for(Posting p: pList) {
+                    if(p.pageID.equals(pageID)) {
+                        System.out.print(w + " " + p.freq + "; ");
+                    }
+                }
+            }
+            System.out.println();
+
             Vector<String> parentsId = (Vector<String>) parentLinks.getEntry(pageID);
             System.out.println("Parents Links:");
             for(String linkId: parentsId)

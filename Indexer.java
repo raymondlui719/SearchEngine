@@ -22,20 +22,104 @@ public class Indexer {
 
     private RecordManager recman; // TODO: needed in phase 2
     private DataManager wordID;
-    private DataManager idWord;
-    private DataManager wordInfo;
-    private DataManager pageWord;
+    private DataManager word;
+    private DataManager bodyWord;
+    private DataManager titleWord;
+    private DataManager pageBodyWord;
+    private DataManager pageTitleWord;
+    private DataManager pageBodyMaxTF;
+    private DataManager pageTitleMaxTF;
 
     public Indexer(RecordManager _recman) throws IOException {
         // TODO: index new page here in phase 2
         recman = _recman;
         wordID = new DataManager(recman, "wordID");     // word --> word-id
-        idWord = new DataManager(recman, "idWord");     // word-id --> word
-        wordInfo = new DataManager(recman, "wordInfo"); // word-id --> {page-id, tf}
-        pageWord = new DataManager(recman, "pageWord"); // forward index (page-id --> {keywords})
+        word = new DataManager(recman, "word");     // word-id --> word
+        bodyWord = new DataManager(recman, "bodyWord"); // word-id --> {page-id, tf}
+        titleWord = new DataManager(recman, "titleWord");   
+        pageBodyWord = new DataManager(recman, "pageBodyWord"); // forward index (page-id --> {keywords})
+        pageTitleWord = new DataManager(recman, "pageTitleWord");
+        pageBodyMaxTF = new DataManager(recman, "pageBodyMaxTF");   // forward index (page-id --> max tf)
+        pageTitleMaxTF = new DataManager(recman, "pageTitleMaxTF");
     }
 
-    public void indexNewPage(String pageUrl, String pageID) throws IOException {
+    public void indexPageTitle(String pageUrl, String pageID) throws IOException {
+        int maxTF = 1;
+        String title = Indexer.extractTitle(pageUrl);
+        Vector<String> titles = new Vector<String>();
+        Vector<String> keywords = new Vector<String>();
+        StringTokenizer st = new StringTokenizer(title);
+        while (st.hasMoreTokens()) {
+            titles.add(st.nextToken());
+        }
+
+        for(int i = 0; i < titles.size(); i++)
+        {
+            String stem = StopStem.processWord(titles.get(i));
+            String word_id;
+            if(stem == null || stem.equals(""))
+                continue;
+
+            if(wordID.getEntry(stem) == null)
+            {
+                word_id = String.format("%04d", wordID.getTableSize() + 1);
+                keywords.add(word_id);
+                // word --> word ID
+                wordID.addEntry(stem, word_id);
+                // word ID --> word
+                word.addEntry(word_id, stem);
+                Vector<Posting> pList = new Vector<Posting>();
+                Vector<Integer> word_pos = new Vector<Integer>();
+                word_pos.add(i);
+                pList.add(new Posting(pageID, 1, word_pos));
+                // word ID --> Posting list
+                titleWord.addEntry(word_id, pList);
+            }
+            else
+            {
+                word_id = String.valueOf(wordID.getEntry(stem));
+                if(!keywords.contains(word_id)) {
+                    keywords.add(word_id);
+                }
+                if(titleWord.getEntry(word_id) != null)
+                {
+                    Vector<Posting> pList = (Vector<Posting>) titleWord.getEntry(word_id);
+                    boolean processed = false;
+                    for(Posting p: pList) 
+                    {
+                        if(p.pageID.equals(pageID))
+                        {
+                            if(++p.freq > maxTF) {
+                                maxTF = p.freq;
+                            }
+                            p.word_pos.add(i);
+                            processed = true;
+                            break;
+                        }
+                    }
+                    if(!processed) {
+                        Vector<Integer> word_pos = new Vector<Integer>();
+                        word_pos.add(i);
+                        pList.add(new Posting(pageID, 1, word_pos));
+                    }
+                    titleWord.addEntry(word_id, pList);
+                }
+                else
+                {
+                    Vector<Posting> pList = new Vector<Posting>();
+                    Vector<Integer> word_pos = new Vector<Integer>();
+                    word_pos.add(i);
+                    pList.add(new Posting(pageID, 1, word_pos));
+                    titleWord.addEntry(word_id, pList);
+                }
+            }
+        }
+        pageTitleWord.addEntry(pageID, keywords);
+        pageTitleMaxTF.addEntry(pageID, maxTF);
+    }
+
+    public void indexPageBody(String pageUrl, String pageID) throws IOException {
+        int maxTF = 1;
         Vector<String> words = Indexer.extractWords(pageUrl);
         Vector<String> keywords = new Vector<String>();
         for(int i = 0; i < words.size(); i++)
@@ -52,13 +136,14 @@ public class Indexer {
                 keywords.add(word_id);
                 // word --> word ID
                 wordID.addEntry(stem, word_id);
-                idWord.addEntry(word_id, stem);
+                // word ID --> word
+                word.addEntry(word_id, stem);
                 Vector<Posting> pList = new Vector<Posting>();
                 Vector<Integer> word_pos = new Vector<Integer>();
                 word_pos.add(i);
                 pList.add(new Posting(pageID, 1, word_pos));
                 // word ID --> Posting list
-                wordInfo.addEntry(word_id, pList);
+                bodyWord.addEntry(word_id, pList);
             }
             else
             {
@@ -66,15 +151,17 @@ public class Indexer {
                 if(!keywords.contains(word_id)) {
                     keywords.add(word_id);
                 }
-                if(wordInfo.getEntry(word_id) != null)
+                if(bodyWord.getEntry(word_id) != null)
                 {
-                    Vector<Posting> pList = (Vector<Posting>) wordInfo.getEntry(word_id);
+                    Vector<Posting> pList = (Vector<Posting>) bodyWord.getEntry(word_id);
                     boolean processed = false;
                     for(Posting p: pList) 
                     {
                         if(p.pageID.equals(pageID))
                         {
-                            p.freq++;
+                            if(++p.freq > maxTF) {
+                                maxTF = p.freq;
+                            }
                             p.word_pos.add(i);
                             processed = true;
                             break;
@@ -85,7 +172,7 @@ public class Indexer {
                         word_pos.add(i);
                         pList.add(new Posting(pageID, 1, word_pos));
                     }
-                    wordInfo.addEntry(word_id, pList);
+                    bodyWord.addEntry(word_id, pList);
                 }
                 else
                 {
@@ -93,11 +180,12 @@ public class Indexer {
                     Vector<Integer> word_pos = new Vector<Integer>();
                     word_pos.add(i);
                     pList.add(new Posting(pageID, 1, word_pos));
-                    wordInfo.addEntry(word_id, pList);
+                    bodyWord.addEntry(word_id, pList);
                 }
             }
         }
-        pageWord.addEntry(pageID, keywords);
+        pageBodyWord.addEntry(pageID, keywords);
+        pageBodyMaxTF.addEntry(pageID, maxTF);
     }
 
     public static Vector<String> extractWords(String url) {

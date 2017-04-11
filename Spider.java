@@ -96,12 +96,9 @@ public class Spider {
 
 				// pageID ==> pageInfo
 				pageInfo.addEntry(id, page);
-				//recman.commit();
-
-				/*
-					TODO: index the word to word ID and word ID to posting list table
-				*/
-				indexer.indexNewPage(onePage, id);
+				
+				indexer.indexPageTitle(onePage, id);
+				indexer.indexPageBody(onePage, id);
 
 				Vector<String> links = Indexer.extractLinks(onePage);
 				Vector<String> links_without_dup = new Vector<String>(new LinkedHashSet<String>(links));
