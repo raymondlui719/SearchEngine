@@ -34,6 +34,7 @@ public class TestProgram {
     private DataManager pageBodyMaxTF;
     private DataManager pageTitleMaxTF;
     private int pageCount;
+    private Score score;
 
  
     public TestProgram(String database) throws IOException {
@@ -54,6 +55,7 @@ public class TestProgram {
         pageBodyMaxTF = new DataManager(recman, "pageBodyMaxTF");   // forward index (page-id --> max tf)
         pageTitleMaxTF = new DataManager(recman, "pageTitleMaxTF");
         pageCount = 0;
+        score = new Score(recman);
 	}
 
     public void finalize() throws IOException {
@@ -85,27 +87,30 @@ public class TestProgram {
 
             Vector<String> titleWordIDs = (Vector<String>) pageTitleWord.getEntry(pageID);
             for(String tid: titleWordIDs)
-            {
-                String w = String.valueOf(word.getEntry(tid));
+            {   String w = String.valueOf(word.getEntry(tid));
                 Vector<Posting> pList = (Vector<Posting>) titleWord.getEntry(tid);
+                
                 for(Posting p: pList) {
                     if(p.pageID.equals(pageID)) {
                         System.out.print(w + " " + p.freq + "; ");
                     }
                 }
+                double mark = score.getTermWeight(pageID,tid,false);
+                System.out.println("Title Term Weight: "+mark);
             }
             System.out.println();
 
             Vector<String> bodyWordIDs = (Vector<String>) pageBodyWord.getEntry(pageID);
             for(String bid: bodyWordIDs)
-            {
-                String w = String.valueOf(word.getEntry(bid));
+            {   String w = String.valueOf(word.getEntry(bid));
                 Vector<Posting> pList = (Vector<Posting>) bodyWord.getEntry(bid);
                 for(Posting p: pList) {
                     if(p.pageID.equals(pageID)) {
                         System.out.print(w + " " + p.freq + "; ");
                     }
                 }
+                double mark = score.getTermWeight(pageID,bid,true);
+                System.out.println("Term Weight: "+mark);
             }
             System.out.println();
 
