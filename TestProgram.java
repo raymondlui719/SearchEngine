@@ -34,7 +34,7 @@ public class TestProgram {
     private DataManager pageBodyMaxTF;
     private DataManager pageTitleMaxTF;
     private int pageCount;
-    private Score score;
+    private TermWeight termWeight;
 
  
     public TestProgram(String database) throws IOException {
@@ -55,7 +55,7 @@ public class TestProgram {
         pageBodyMaxTF = new DataManager(recman, "pageBodyMaxTF");   // forward index (page-id --> max tf)
         pageTitleMaxTF = new DataManager(recman, "pageTitleMaxTF");
         pageCount = 0;
-        score = new Score(recman);
+        termWeight = new TermWeight(recman);
 	}
 
     public void finalize() throws IOException {
@@ -95,7 +95,7 @@ public class TestProgram {
                         System.out.print(w + " " + p.freq + "; ");
                     }
                 }
-                double mark = score.getTermWeight(pageID,tid,false);
+                double mark = termWeight.getTermWeight(pageID,tid,false);
                 System.out.println("Title Term Weight: "+mark);
             }
             System.out.println();
@@ -109,7 +109,7 @@ public class TestProgram {
                         System.out.print(w + " " + p.freq + "; ");
                     }
                 }
-                double mark = score.getTermWeight(pageID,bid,true);
+                double mark = termWeight.getTermWeight(pageID,bid,true);
                 System.out.println("Term Weight: "+mark);
             }
             System.out.println();

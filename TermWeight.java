@@ -4,7 +4,7 @@ import java.util.Vector;
 import jdbm.RecordManager;
 import jdbm.htree.HTree;
 
-public class Score {
+public class TermWeight {
     private RecordManager recman;
     private DataManager wordID;
     private DataManager word;
@@ -15,7 +15,7 @@ public class Score {
     private DataManager pageBodyMaxTF;
     private DataManager pageTitleMaxTF;
 
-    public Score(RecordManager _recman) throws IOException {
+    public TermWeight(RecordManager _recman) throws IOException {
         recman = _recman;
         wordID = new DataManager(recman, "wordID");     // word --> word-id
         word = new DataManager(recman, "word");     // word-id --> word
