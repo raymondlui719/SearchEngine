@@ -6,7 +6,7 @@ DEPENDENCIES = jdbm-1.0.jar:htmlparser.jar:.
 	$(JCC) $(CLASSPATH) $(DEPENDENCIES) $*.java
 
 CLASSES = \
-    Score.java \
+    TermWeight.java \
 	Posting.java \
 	DataManager.java \
 	Indexer.java \
