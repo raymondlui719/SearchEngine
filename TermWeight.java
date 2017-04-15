@@ -30,7 +30,7 @@ public class Score {
     public double getTermWeight (String page_Id,String word_Id,boolean isBody) throws IOException {
         int tf = 0;
         int df = 0;   
-        // if the term is in body     
+        // if the term is in the body     
         if(isBody) {
             Vector<Posting>bodypostingList = (Vector<Posting>) bodyWord.getEntry(word_Id);
             if(bodypostingList == null) {
@@ -43,7 +43,7 @@ public class Score {
                 }
             }
             df = bodypostingList.size();
-        }else { // if the term is in title
+        }else { // if the term is in the title
             Vector<Posting>titlepostingList = (Vector<Posting>) titleWord.getEntry(word_Id);
             if(bodypostingList == null) {
                 return 0;
@@ -57,10 +57,9 @@ public class Score {
             df = titlepostingList.size();
         }
         int maxTF = (int) pageBodyMaxTF.getEntry(page_Id); 
-    
        
         // idf = log2 (N/df)
         double idf = Math.log((pageBodyMaxTF.getTableSize()*1.0)/df)/Math.log(2);
         return (tf*idf)/maxTF;   
-    }
+    }   
 }
