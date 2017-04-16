@@ -33,6 +33,11 @@ public class Phrase {
 	private Hashtable<String, Integer>	bodyDFs;
 	private Hashtable<String, Integer>	titleDFs;
 
+	public String pageIDtoURL(String pageID) throws IOException
+	{
+		return String.valueOf(pageUrl.getEntry(pageID));
+	}
+
 	public Phrase(String phrase) throws IOException {
 		recman = RecordManagerFactory.createRecordManager("Database");
 
@@ -69,9 +74,20 @@ public class Phrase {
 			calculateDF(bodyWord, bodyDFs);
 			calculateDF(titleWord, titleDFs);
 
+			System.out.println("Body: -----------------");
 			calculatePhraseFreq(bPosts, bodyPfs);
+			System.out.println("Title: -----------------");
 			calculatePhraseFreq(tPosts, titlePfs);
+
+			calculateWeight(bodyPhWeights, bodyDFs, bodyPfs);
+			calculateWeight(titlePhWeights, titleDFs, titlePfs);
 		}
+	}
+
+	public Hashtable<String, Double> getWeight(boolean isBody)
+	{
+		if(isBody) return bodyPhWeights;
+		else return titlePhWeights;
 	}
 
 	public Vector<Vector<Posting>> initializePosting(DataManager wordInfo) throws IOException {
@@ -124,13 +140,35 @@ public class Phrase {
 			Vector<Posting> pList = ht.get(pageID);
 			if(pList.size() == words.size()) {
 				int pf = findFreq(pList);
-				String url = String.valueOf(pageUrl.getEntry(pageID));
-				System.out.println(url + " --- " + pf);
 				pfs.put(pageID, pf);
 			}
 			else
 				pfs.put(pageID, 0);
 		}
+	}
+
+	public void calculateWeight(Hashtable<String, Double> weight, Hashtable<String, Integer> dfs, Hashtable<String, Integer> pfs) throws IOException
+	{
+		double idf = 0.0;
+		// for each term in phrase, calculate idf of the term, and then take the total sum of it
+		for(String w: words)
+		{
+			int df = dfs.get(w);
+			if(df == 0.0)
+			{
+				idf = 0.0;
+				break;
+			}
+			idf += Math.log(((double) pageInfo.getTableSize()) / df) / Math.log(2);
+		}
+
+		Enumeration<String> e = pfs.keys();
+		while(e.hasMoreElements())
+		{
+			String pageID = e.nextElement();
+			weight.put(pageID, (idf * (double)pfs.get(pageID) / words.size()));
+		}
+
 	}
 
 	public int findFreq(Vector<Posting> pList) throws IOException
@@ -169,8 +207,10 @@ public class Phrase {
 					break;
 				else if(nextWordPos.get(nextWordIndex) == currWordPos.get(currWordIndex) + wordPosInQuery.get(i+1) - wordPosInQuery.get(i))	// exact adjacency
 					adjacent = true;
-				else
+				else {
+					adjacent = false;
 					break;
+				}
 			}
 			if(adjacent)	// the phrase passes all tests
 				freq++;
@@ -186,5 +226,14 @@ public class Phrase {
 		System.out.println("Enter a phrase: ");
 		String p = br.readLine();
 		Phrase pp = new Phrase(p);
+		Hashtable<String, Double> bodyPhWeights = pp.getWeight(true);
+		Hashtable<String, Double> titlePhWeights = pp.getWeight(false);
+		Enumeration<String> e = bodyPhWeights.keys();
+		while(e.hasMoreElements())
+		{
+			String pageID = e.nextElement();
+			//String url = String.valueOf(pageUrl.getEntry(pageID));
+			System.out.println("Score: " + bodyPhWeights.get(pageID) + " --- " + pp.pageIDtoURL(pageID));
+		}
 	}
 }
