@@ -74,9 +74,7 @@ public class Phrase {
 			calculateDF(bodyWord, bodyDFs);
 			calculateDF(titleWord, titleDFs);
 
-			System.out.println("Body: -----------------");
 			calculatePhraseFreq(bPosts, bodyPfs);
-			System.out.println("Title: -----------------");
 			calculatePhraseFreq(tPosts, titlePfs);
 
 			calculateWeight(bodyPhWeights, bodyDFs, bodyPfs);
@@ -140,10 +138,9 @@ public class Phrase {
 			Vector<Posting> pList = ht.get(pageID);
 			if(pList.size() == words.size()) {
 				int pf = findFreq(pList);
-				pfs.put(pageID, pf);
+				if(pf > 0)
+					pfs.put(pageID, pf);
 			}
-			else
-				pfs.put(pageID, 0);
 		}
 	}
 
@@ -232,7 +229,6 @@ public class Phrase {
 		while(e.hasMoreElements())
 		{
 			String pageID = e.nextElement();
-			//String url = String.valueOf(pageUrl.getEntry(pageID));
 			System.out.println("Score: " + bodyPhWeights.get(pageID) + " --- " + pp.pageIDtoURL(pageID));
 		}
 	}
