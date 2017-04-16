@@ -15,6 +15,7 @@ CLASSES = \
 	Spider.java \
 	StopStem.java \
 	TestProgram.java \
+	Phrase.java \
 	./IRUtilities/Porter.java
 	
 default: classes

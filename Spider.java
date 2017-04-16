@@ -170,8 +170,8 @@ public class Spider {
     }
    	public static void main(String[] arg) throws IOException, ParserException {
 		String db = "Database";
-		String startUrl = "https://course.cse.ust.hk/comp4321/labs/TestPages/testpage.htm";
-		final int maxPage = 300;
+		String startUrl = "http://www.cse.ust.hk/";
+		final int maxPage = 30;
 
 		Spider spider = new Spider(db);
 

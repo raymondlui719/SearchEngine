@@ -45,7 +45,7 @@ public class TermWeight {
             df = bodypostingList.size();
         }else { // if the term is in the title
             Vector<Posting>titlepostingList = (Vector<Posting>) titleWord.getEntry(word_Id);
-            if(bodypostingList == null) {
+            if(titlepostingList == null) {
                 return 0;
             }
             for (Posting p:titlepostingList) {
