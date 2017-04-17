@@ -35,6 +35,7 @@ public class TestProgram {
     private DataManager pageTitleMaxTF;
     private int pageCount;
     private TermWeight termWeight;
+    private Query query;
 
  
     public TestProgram(String database) throws IOException {
@@ -56,6 +57,7 @@ public class TestProgram {
         pageTitleMaxTF = new DataManager(recman, "pageTitleMaxTF");
         pageCount = 0;
         termWeight = new TermWeight(recman);
+        query = new Query(recman);
 	}
 
     public void finalize() throws IOException {
@@ -112,6 +114,8 @@ public class TestProgram {
                 double mark = termWeight.getTermWeight(pageID,bid,true);
                 System.out.println("Term Weight: "+mark);
             }
+            double score = query.getScore("comput engine",pageID);
+            System.out.println("Score: "+score);
             System.out.println();
 
             Vector<String> parentsId = (Vector<String>) parentLinks.getEntry(pageID);
