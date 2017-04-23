@@ -38,8 +38,8 @@ public class Phrase {
 		return String.valueOf(pageUrl.getEntry(pageID));
 	}
 
-	public Phrase(String phrase) throws IOException {
-		recman = RecordManagerFactory.createRecordManager("Database");
+	public Phrase(RecordManager _recman, String phrase) throws IOException {
+		recman = _recman;
 
 		wordPosInQuery = new Vector<Integer>();
 		pageInfo 	= new DataManager(recman, "pageInfo");
@@ -219,17 +219,27 @@ public class Phrase {
 	}
 
 	public static void main(String[] args) throws IOException {
+		RecordManager recman = RecordManagerFactory.createRecordManager("Database");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("Enter a phrase: ");
 		String p = br.readLine();
-		Phrase pp = new Phrase(p);
+		Phrase pp = new Phrase(recman, p);
 		Hashtable<String, Double> bodyPhWeights = pp.getWeight(true);
 		Hashtable<String, Double> titlePhWeights = pp.getWeight(false);
+
+		System.out.println("Body search result: ");
 		Enumeration<String> e = bodyPhWeights.keys();
 		while(e.hasMoreElements())
 		{
 			String pageID = e.nextElement();
 			System.out.println("Score: " + bodyPhWeights.get(pageID) + " --- " + pp.pageIDtoURL(pageID));
+		}
+		System.out.println("Title search result: ");
+		Enumeration<String> e2 = titlePhWeights.keys();
+		while(e2.hasMoreElements())
+		{
+			String pageID = e2.nextElement();
+			System.out.println("Score: " + titlePhWeights.get(pageID) + " --- " + pp.pageIDtoURL(pageID));
 		}
 	}
 }

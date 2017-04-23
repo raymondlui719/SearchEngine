@@ -114,8 +114,8 @@ public class TestProgram {
                 double mark = termWeight.getTermWeight(pageID,bid,true);
                 System.out.println("Term Weight: "+mark);
             }
-            double score = query.getScore("comput engine",pageID);
-            System.out.println("Score: "+score);
+            //double score = query.getScore("comput engine",pageID);
+            //System.out.println("Score: "+score);
             System.out.println();
 
             Vector<String> parentsId = (Vector<String>) parentLinks.getEntry(pageID);

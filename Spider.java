@@ -9,6 +9,7 @@ import jdbm.RecordManagerFactory;
 import jdbm.helper.FastIterator;
 import jdbm.htree.HTree;
 
+@SuppressWarnings("unchecked")
 public class Spider {
 	private static RecordManager recman;
 	private Indexer indexer;

@@ -12,7 +12,6 @@ CLASSES = \
 	DataManager.java \
 	Indexer.java \
 	Page.java \
-	PageAdapter.java \
 	Spider.java \
 	StopStem.java \
 	TestProgram.java \

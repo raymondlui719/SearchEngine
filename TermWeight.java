@@ -2,8 +2,10 @@ import java.io.IOException;
 import java.util.Vector;
 
 import jdbm.RecordManager;
+
 import jdbm.htree.HTree;
 
+@SuppressWarnings("unchecked")
 public class TermWeight {
     private RecordManager recman;
     private DataManager wordID;
@@ -43,7 +45,8 @@ public class TermWeight {
                 }
             }
             df = bodypostingList.size();
-        }else { // if the term is in the title
+        }
+        else { // if the term is in the title
             Vector<Posting>titlepostingList = (Vector<Posting>) titleWord.getEntry(word_Id);
             if(titlepostingList == null) {
                 return 0;
@@ -61,5 +64,6 @@ public class TermWeight {
         // idf = log2 (N/df)
         double idf = Math.log((pageBodyMaxTF.getTableSize()*1.0)/df)/Math.log(2);
         return (tf*idf)/maxTF;   
-    }   
+    }
+
 }
