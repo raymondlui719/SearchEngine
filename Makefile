@@ -9,6 +9,7 @@ CLASSES = \
     Query.java \
     TermWeight.java \
 	Posting.java \
+	ForwardPosting.java \
 	DataManager.java \
 	Indexer.java \
 	Page.java \

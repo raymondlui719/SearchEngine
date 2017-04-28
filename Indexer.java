@@ -1,5 +1,7 @@
 
 import java.util.Vector;
+import java.util.Collections;
+import java.util.StringTokenizer;
 import org.htmlparser.beans.StringBean;
 import org.htmlparser.Node;
 import org.htmlparser.NodeFilter;
@@ -10,7 +12,6 @@ import org.htmlparser.filters.TagNameFilter;
 import org.htmlparser.tags.LinkTag;
 import org.htmlparser.util.NodeList;
 import org.htmlparser.util.ParserException;
-import java.util.StringTokenizer;
 import org.htmlparser.beans.LinkBean;
 import java.net.URL;
 import java.io.IOException;
@@ -55,7 +56,7 @@ public class Indexer {
 
         for(int i = 0; i < titles.size(); i++)
         {
-            String stem = StopStem.processWord(titles.get(i));
+            String stem = StopStem.processWord(titles.get(i).toLowerCase());
             String word_id;
             if(stem == null || stem.equals(""))
                 continue;
@@ -121,10 +122,10 @@ public class Indexer {
     public void indexPageBody(String pageUrl, String pageID) throws IOException {
         int maxTF = 1;
         Vector<String> words = Indexer.extractWords(pageUrl);
-        Vector<String> keywords = new Vector<String>();
+        Vector<ForwardPosting> keywords = new Vector<ForwardPosting>();
         for(int i = 0; i < words.size(); i++)
         {
-            String stem = StopStem.processWord(words.get(i));
+            String stem = StopStem.processWord(words.get(i).toLowerCase());
             String word_id;
             if(stem == null || stem.equals(""))
                 continue;
@@ -133,7 +134,7 @@ public class Indexer {
             if(wordID.getEntry(stem) == null)
             {
                 word_id = String.format("%04d", wordID.getTableSize() + 1);
-                keywords.add(word_id);
+                keywords.add(new ForwardPosting(word_id, 1));
                 // word --> word ID
                 wordID.addEntry(stem, word_id);
                 // word ID --> word
@@ -148,8 +149,20 @@ public class Indexer {
             else
             {
                 word_id = String.valueOf(wordID.getEntry(stem));
-                if(!keywords.contains(word_id)) {
-                    keywords.add(word_id);
+                boolean hasKeyword = false;
+                int index = 0;
+                for(int j = 0; j < keywords.size(); j++)
+                {
+                    if(keywords.get(j).wordID.equals(word_id))
+                    {
+                        hasKeyword = true;
+                        index = j;
+                        break;
+                    }
+                }
+                if(!hasKeyword) {
+                    keywords.add(new ForwardPosting(word_id, 1));
+                    index = keywords.size() - 1;
                 }
                 if(bodyWord.getEntry(word_id) != null)
                 {
@@ -162,6 +175,7 @@ public class Indexer {
                             if(++p.freq > maxTF) {
                                 maxTF = p.freq;
                             }
+                            keywords.set(index, new ForwardPosting(word_id, p.freq));
                             p.word_pos.add(i);
                             processed = true;
                             break;
@@ -184,6 +198,7 @@ public class Indexer {
                 }
             }
         }
+        Collections.sort(keywords);
         pageBodyWord.addEntry(pageID, keywords);
         pageBodyMaxTF.addEntry(pageID, maxTF);
     }

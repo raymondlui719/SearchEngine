@@ -96,6 +96,7 @@ public class Query {
     }
 
     public Vector<Score> getScore(String query) throws IOException {
+        double queryLength = 0.0;
         pageScore = new Hashtable<String, Score>();
         String mQuery = query.toLowerCase().replaceAll("[^a-z\"\']", " ");
         String[] terms = mQuery.split("[\"\']");
@@ -114,6 +115,7 @@ public class Query {
                         continue;
                     calculatePartialScore(words[j]);
                 }
+                queryLength += words.length;
                 //double bodyTermWeight = termWeight.getTermWeight(pageId,word_id, true);
                 //termWeightList.add(bodyTermWeight);
             }
@@ -122,6 +124,7 @@ public class Query {
                     continue;
 
                 Phrase phrase = new Phrase(recman, terms[i]);
+                queryLength += phrase.getPhraseLength();
                 Hashtable<String, Double> bodyPhWeights = phrase.getWeight(true);
                 Hashtable<String, Double> titlePhWeights = phrase.getWeight(false);
 
@@ -164,7 +167,25 @@ public class Query {
         String pageID;
         while(temp.hasMoreElements()) {
             pageID = temp.nextElement();
-            searchResult.add(new Score(pageID, pageScore.get(pageID).body, pageScore.get(pageID).title));
+
+            // cosine similarity calculation
+            Vector<ForwardPosting> temp1 = (Vector<ForwardPosting>) pageBodyWord.getEntry(pageID);
+            double bodyLength = Math.sqrt(temp1.size() * 1.0);
+            Vector<String> temp2 = (Vector<String>) pageTitleWord.getEntry(pageID);
+            double titleLength = Math.sqrt(temp2.size() * 1.0);
+            double bodyScore, titleScore;
+            if(bodyLength != 0.0)
+                bodyScore = pageScore.get(pageID).body / (bodyLength * queryLength);
+            else
+                bodyScore = 0.0;
+
+            if(titleLength != 0.0)
+                titleScore = pageScore.get(pageID).title / (titleLength * queryLength);
+            else
+                titleScore = 0.0;
+            System.out.println(pageID + ": (" + bodyScore + ", " + titleScore + ")");
+
+            searchResult.add(new Score(pageID, bodyScore, titleScore));
         }
 
         Collections.sort(searchResult);

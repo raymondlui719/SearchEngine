@@ -13,6 +13,7 @@ import jdbm.RecordManagerFactory;
 @SuppressWarnings("unchecked")
 public class Phrase {
 
+	private int phraseLength;
 	private RecordManager 	recman;
 	private Vector<String> 	words;
 	private DataManager 	pageInfo;
@@ -68,6 +69,8 @@ public class Phrase {
 			wordPosInQuery.add(i);
 		}
 		if(!noSuchKeywordInDb) {
+			phraseLength = words.size();
+
 			bPosts = initializePosting(bodyWord);
 			tPosts = initializePosting(titleWord);
 
@@ -80,6 +83,10 @@ public class Phrase {
 			calculateWeight(bodyPhWeights, bodyDFs, bodyPfs);
 			calculateWeight(titlePhWeights, titleDFs, titlePfs);
 		}
+	}
+
+	public int getPhraseLength() {
+		return phraseLength;
 	}
 
 	public Hashtable<String, Double> getWeight(boolean isBody)

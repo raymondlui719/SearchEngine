@@ -64,7 +64,11 @@ public class StopStem {
       return "";
     }
     else {
-      return stem(str);
+      String s = stem(str);
+      if(isNumber(s))
+        return "";
+      else
+        return s;
     }
   }
 

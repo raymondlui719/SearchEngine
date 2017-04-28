@@ -10,13 +10,13 @@ public class Score implements Comparable<Score>
 		this.pageID = id;
 		this.body = _body;
 		this.title = _title;
-		this.overall = this.body + 2.0 * this.title;
+		this.overall = this.body + 5.0 * this.title;
 	}
 
 	public Score(double _body, double _title) {
 		this.body = _body;
 		this.title = _title;
-		this.overall = this.body + 2.0 * this.title;
+		this.overall = this.body + 5.0 * this.title;
 	}
 
 	@Override

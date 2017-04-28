@@ -102,17 +102,21 @@ public class TestProgram {
             }
             System.out.println();
 
-            Vector<String> bodyWordIDs = (Vector<String>) pageBodyWord.getEntry(pageID);
-            for(String bid: bodyWordIDs)
-            {   String w = String.valueOf(word.getEntry(bid));
-                Vector<Posting> pList = (Vector<Posting>) bodyWord.getEntry(bid);
-                for(Posting p: pList) {
-                    if(p.pageID.equals(pageID)) {
-                        System.out.print(w + " " + p.freq + "; ");
-                    }
-                }
-                double mark = termWeight.getTermWeight(pageID,bid,true);
-                System.out.println("Term Weight: "+mark);
+            Vector<ForwardPosting> bodyWordIDs = (Vector<ForwardPosting>) pageBodyWord.getEntry(pageID);
+            for(ForwardPosting fp: bodyWordIDs)
+            {
+                String id = fp.wordID;
+                String w = String.valueOf(word.getEntry(id));
+                System.out.println(w + " " + fp.freq);
+                // String w = String.valueOf(word.getEntry(bid));
+                // Vector<Posting> pList = (Vector<Posting>) bodyWord.getEntry(bid);
+                // for(Posting p: pList) {
+                //     if(p.pageID.equals(pageID)) {
+                //         System.out.print(w + " " + p.freq + "; ");
+                //     }
+                // }
+                double mark = termWeight.getTermWeight(pageID, fp.wordID, true);
+                System.out.println("Term Weight: " + mark);
             }
             //double score = query.getScore("comput engine",pageID);
             //System.out.println("Score: "+score);
