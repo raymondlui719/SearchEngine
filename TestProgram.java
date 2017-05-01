@@ -107,7 +107,7 @@ public class TestProgram {
             {
                 String id = fp.wordID;
                 String w = String.valueOf(word.getEntry(id));
-                System.out.println(w + " " + fp.freq);
+                System.out.print(w + " " + fp.freq + "; ");
                 // String w = String.valueOf(word.getEntry(bid));
                 // Vector<Posting> pList = (Vector<Posting>) bodyWord.getEntry(bid);
                 // for(Posting p: pList) {
@@ -115,8 +115,8 @@ public class TestProgram {
                 //         System.out.print(w + " " + p.freq + "; ");
                 //     }
                 // }
-                double mark = termWeight.getTermWeight(pageID, fp.wordID, true);
-                System.out.println("Term Weight: " + mark);
+                //double mark = termWeight.getTermWeight(pageID, fp.wordID, true);
+                //System.out.println("Term Weight: " + mark);
             }
             //double score = query.getScore("comput engine",pageID);
             //System.out.println("Score: "+score);
@@ -148,8 +148,14 @@ public class TestProgram {
 
     public static void main(String[] args) throws IOException {
         String db = "Database";
+        PrintStream systemOut = new PrintStream(System.out);
         TestProgram tp = new TestProgram(db);
-		tp.print();
+        System.out.println("Generating result text file...");
+        long t1 = System.currentTimeMillis();
+        tp.print();
+        long t2 = System.currentTimeMillis();
+        double genTime = (t2 - t1) / 1000.0;
+        systemOut.println("Result text file generated in " + genTime + " seconds");
         tp.finalize();
     }
 }
